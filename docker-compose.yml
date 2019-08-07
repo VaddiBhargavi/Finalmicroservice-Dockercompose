@@ -1,0 +1,85 @@
+version: "2.1"
+services:
+#Docker compose for apigateway,
+#  with image & container name,
+#  with restart as always,
+#  and also displays on which servers this depends on & with healthcheck to represent it as working well
+ apigateway:
+  image: zuul-service
+  build: spring-boot-zuulgatwayproxy/
+  restart: always
+  network_mode: host
+  hostname: localhost
+  container_name: apigateway-container
+  depends_on:
+    - eureka-server
+    - muzix
+  ports:
+    - 8092:8092
+  healthcheck:
+       test: "exit 0"
+  #Docker compose for eurekaserver,
+  #  with image & container name,
+  #  with restart as always,
+  #  and also displays on which servers this depends on & with healthcheck to represent it as working well
+ eureka-server:
+  image: eureka-servcie
+  build: eureka-server/
+  container_name: eureka-container1
+  restart: always
+  network_mode: host
+  hostname: localhost
+  ports:
+    - 9090:9090
+  healthcheck:
+     test: "exit 0"
+  #Docker compose for configserver,
+  #  with image & container name,
+  #  with restart as always,
+  #  and also displays on which servers this depends on & with healthcheck to represent it as working well
+ config-service:
+  image: config-service
+  build: config-service/
+  restart: always
+  network_mode: host
+  hostname: localhost
+  container_name: config-container1
+  ports:
+    - 8891:8891
+  healthcheck:
+     test: "exit 0"
+  #Docker compose for muzix,
+  #  with image & container name,
+  #  with restart as always,
+  #  and also displays on which servers this depends on & with healthcheck to represent it as working well
+ muzix:
+  image: musix-app-assignment
+  container_name: muzix
+  build: muzix/
+  restart: always
+  network_mode: host
+  hostname: localhost
+  depends_on:
+    - eureka-server
+    - config-service
+    - mongo
+  ports:
+    - 8080:8080
+  expose:
+    - 8080
+  healthcheck:
+     test: "exit 0"
+  #Docker compose for mongo,
+  #  with image & container name,
+  #  with restart as always,
+  #  and also displays on which servers this depends on & with healthcheck to represent it as working well
+ mongo:
+  image: mongo:3.4-jessie
+  container_name: mongo
+  network_mode: host
+  hostname: localhost
+  restart: always
+  ports:
+    - 27017:27017
+  healthcheck:
+     test: "exit 0"
